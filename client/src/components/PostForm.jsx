@@ -61,7 +61,7 @@ const PostForm = () => {
       }
     } catch (error) {
         setLoading(false);
-      console.error("Error submitting form:", error);
+      console.error("Error submitting form:");
     }finally{
         setLoading(false);
     }
