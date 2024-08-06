@@ -46,7 +46,7 @@ const PostForm = () => {
     }
 
     try {
-      const response = await fetch("https://og-image-cp1b.onrender.com//generate-og-image", {
+      const response = await fetch("https://og-image-cp1b.onrender.com/generate-og-image", {
         method: "POST",
         body: formData,
       });
@@ -57,11 +57,10 @@ const PostForm = () => {
         console.log("Image generated successfully:", data.imageUrl);
         setImageUrl(data.imageUrl);
       } else {
-        console.error("Error generating image:", data.error || "Unknown error");
+        console.log("Error generating image:", data.error || "Unknown error");
       }
     } catch (error) {
-        setLoading(false);
-      console.error("Error submitting form:");
+      console.log("Error submitting form:");
     }finally{
         setLoading(false);
     }
