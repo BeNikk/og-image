@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Helmet } from "react-helmet";
 
@@ -8,6 +9,7 @@ const PostForm = () => {
     image: null,
   });
   const [imageUrl, setImageUrl] = useState(null);
+  const [loading,setLoading]=useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formDataState, [e.target.name]: e.target.value });
@@ -34,6 +36,7 @@ const PostForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const formData = new FormData();
     formData.append("title", formDataState.title);
@@ -57,7 +60,10 @@ const PostForm = () => {
         console.error("Error generating image:", data.error || "Unknown error");
       }
     } catch (error) {
+        setLoading(false);
       console.error("Error submitting form:", error);
+    }finally{
+        setLoading(false);
     }
   };
 
@@ -67,6 +73,12 @@ const PostForm = () => {
         <Helmet>
           <meta property="og:image" content={imageUrl} />
         </Helmet>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <p className="text-xl font-bold">Generating</p>
+            <Loader2 className="animate-spin"/>
+        </div>
       )}
       <form
         onSubmit={handleSubmit}
@@ -104,7 +116,7 @@ const PostForm = () => {
 
         <label
           htmlFor="image"
-          className="block text-lg font-semibold text-blue-700"
+          className="block text-lg font-semibold text-black"
         >
           Image
         </label>
@@ -139,16 +151,10 @@ const PostForm = () => {
       alt="Generated OG Image"
       className="w-full  h-96 object-contain object-center"
     />
-    <div className="flex flex-row gap-4 items-center justify-around  w-full m-2 rounded-md h-8 ">
+    <div className="flex flex-row gap-4 items-center justify-center  w-full m-2 rounded-md h-8 ">
 
-    <a
-      href={imageUrl}
-      download="my_image.png"
-      className="block text-center m-1 p-2 rounded-lg bg-green-300 w-1/3 text-white hover:text-blue-800 "
-    >
-      Download Image
-    </a>
-    <a href={imageUrl} className="block bg-gray-700 p-2 rounded-lg text-center m-1 text-white w-1/3 " target="_blank">Open image</a>
+   
+    <a href={imageUrl} className="block bg-gray-700 p-2 rounded-lg text-center m-1 text-white w-1/2 " target="_blank">Open image</a>
     </div>
   </div>
 )}

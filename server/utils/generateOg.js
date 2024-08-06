@@ -1,8 +1,17 @@
 const canvas = require('canvas');
 const fs = require('fs').promises;
 const path = require('path');
+const cloudinary = require('cloudinary').v2;
 
-const loadCanvasImage = async (src) => {
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+
+
+  const loadCanvasImage = async (src) => {
   return new Promise((resolve, reject) => {
     const image = new canvas.Image();
     image.onload = () => resolve(image);
@@ -10,6 +19,17 @@ const loadCanvasImage = async (src) => {
     image.src = src;
   });
 };
+
+//uploading to cdn
+const uploadImageToCloudinary = async (imageBuffer) => {
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }).end(imageBuffer);
+    });
+  };
+  
 
 const generateImage = async (title, content, file) => {
   try {
@@ -92,14 +112,17 @@ const generateImage = async (title, content, file) => {
       ctx.strokeRect(imageX - 5, imageY - 5, imageWidth + 10, imageHeight + 10);
 
       const imageBuffer = await ogCanvas.toBuffer('image/png');
-      const imageData = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+     // const imageData = `data:image/png;base64,${imageBuffer.toString('base64')}`;(can serve base64 directly)
+     const imageUrl = await uploadImageToCloudinary(imageBuffer);
       await fs.unlink(filePath);
 
-      return imageData;
+      return imageUrl;
     } else {
       const imageBuffer = await ogCanvas.toBuffer('image/png');
-      const imageData = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-      return imageData;
+    //   const imageData = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+      const imageUrl = await uploadImageToCloudinary(imageBuffer);
+
+      return imageUrl;
     }
   } catch (error) {
     console.error('Error generating image:', error);
