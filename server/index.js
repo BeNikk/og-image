@@ -28,7 +28,9 @@ app.post('/generate-og-image', upload.single('image'), async (req, res) => {
     res.status(500).json({ error: 'Image generation failed' });
   }
 });
-
+app.get('/',(req,res)=>{
+    res.send('hello world');
+})
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
